@@ -1,0 +1,138 @@
+{% extends 'layout.html' %}
+{% block cart %}
+
+<!-- Page Banner start -->
+<section class="page-start-banner">
+    <div class="container">
+        <h2 class="title">Cart</h2>
+    </div>
+</section>
+<!-- Page Banner End -->
+
+<!-- Cart Area start -->
+<section class="cart pt-48 pb-48">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-8">
+                <div class="heading">
+                    <h4>Your Cart Items</h4>
+                </div>
+                <table class="cart-table-lg" id="cartTable">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartItems">
+                        {% for item in cart_items %}
+                        <tr data-id="{{ item['id'] }}">
+                            <td><img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" alt="{{ item['name'] }}" style="width: 100px;"></td>
+                            <td>{{ item['name'] }}</td>
+                            <td>${{ item['price'] }}</td>
+                            <td>
+                                <input type="number" value="{{ item['quantity'] }}" min="1" class="quantity-input">
+                            </td>
+                            <td class="subtotal">${{ item['quantity'] * item['price'] }}</td>
+                            <td>
+                                <button class="btn btn-danger remove-btn">Remove</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if not cart_items %}
+                <p>Your cart is empty.</p>
+                {% endif %}
+            
+             <!-- Add this after the cart table -->
+                {% if total_pages > 1 %}
+                <div class="pagination mt-4">
+                    {% if has_prev %}
+                    <a href="{{ url_for('cart', page=current_page-1) }}" class="btn btn-outline-primary">&laquo; Previous</a>
+                    {% endif %}
+                    
+                    <span class="mx-3">Page {{ current_page }} of {{ total_pages }}</span>
+                    
+                    {% if has_next %}
+                    <a href="{{ url_for('cart', page=current_page+1) }}" class="btn btn-outline-primary">Next &raquo;</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            </div>
+            <div class="col-xl-4">
+                <div class="cart-summary">
+                    <h4>Cart Summary</h4>
+                    <p>Items Total: $<span id="itemsTotal">{{ cart_total }}</span></p>
+                    <p>Shipping: Free</p>
+                    <p>Tax: $<span id="tax">{{ tax }}</span></p>
+                    <h5>Grand Total: $<span id="grandTotal">{{ grand_total }}</span></h5>
+                    <a href="{{ url_for('checkout') }}" class="cus-btn dark w-100">Proceed to Checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Cart Area end -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Update quantity
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        input.addEventListener('change', function () {
+            const row = this.closest('tr');
+            const productId = row.getAttribute('data-id');
+            const quantity = this.value;
+
+            fetch('/update_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ product_id: productId, quantity: quantity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    row.querySelector('.subtotal').innerText = `$${data.subtotal}`;
+                    document.getElementById('itemsTotal').innerText = data.cart_total;
+                    document.getElementById('tax').innerText = data.tax;
+                    document.getElementById('grandTotal').innerText = data.grand_total;
+                }
+            });
+        });
+    });
+
+    // Remove item
+    document.querySelectorAll('.remove-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            const row = this.closest('tr');
+            const productId = row.getAttribute('data-id');
+
+            fetch('/remove_from_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ product_id: productId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    row.remove();
+                    document.getElementById('itemsTotal').innerText = data.cart_total;
+                    document.getElementById('tax').innerText = data.tax;
+                    document.getElementById('grandTotal').innerText = data.grand_total;
+                }
+            });
+        });
+    });
+});
+</script>
+
+{% endblock cart %}

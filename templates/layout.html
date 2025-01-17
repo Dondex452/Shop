@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    
+<head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1,shrink-to-fit=no">
+        <meta name="description" content="Violet HTML5 Template">
+        {% if current_user.is_authenticated %}
+        <meta name="current-user-id" content="{{ current_user.id }}">
+        <meta name="current-user" content="{{ current_user.username }}">
+        {% endif %}
+
+        <title>Violet - Cosmetics Store Html Template</title>
+
+        <!-- Favicon -->
+        <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static', filename='assets/media/favicon-light.png')}}">
+
+        <!-- All CSS files -->
+        <link rel="stylesheet" href="{{url_for('static', filename='assets/css/vendor/bootstrap.min.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='assets/css/vendor/font-awesome.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='assets/css/vendor/slick.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='assets/css/vendor/slick-theme.css')}}">
+        <link rel="stylesheet" href="{{url_for('static', filename='assets/css/app.css')}}">
+
+        
+       
+ 
+    </head>
+    <style>
+      .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 4px;
+    z-index: 9999;
+    animation: slideIn 0.5s ease-out;
+}
+
+.notification.success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.notification.error {
+    background-color: #f44336;
+    color: white;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}  
+    </style> 
+    <body>
+        <!-- Preloader -->
+        <div id="preloader">
+            <div class="loading loading07">
+              <span data-text="V">V</span>
+              <span data-text="o">o</span>
+              <span data-text="i">i</span>
+              <span data-text="l">l</span>
+              <span data-text="e">e</span>
+              <span data-text="t">t</span>
+            </div>
+        </div>
+        
+        <!-- Back To Top Start -->
+        <a href="#main-wrapper" id="backto-top" class="back-to-top">
+            <i class="fas fa-angle-up"></i>
+        </a>
+        <!-- Main Wrapper Start -->
+        <div id="main-wrapper" class="main-wrapper overflow-hidden">
+
+            <!-- Header Area Start -->
+            <header class="header">
+                <div class="container">
+                    <nav class="navbar navbar-expand-xl">
+                        <a class="navbar-brand" href="{{url_for('index')}}"><img alt=""  src="{{url_for('static', filename='assets/media/logo.png')}}"></a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar"><i class="fas fa-bars"></i></button>
+                        <div class="collapse navbar-collapse text-start" id="mynavbar">
+                            <ul class="navbar-nav mainmenu m-0">
+                                <li class="menu-item"><a href="{{url_for('index')}}" class="active">Home</a></li>
+                                <li class="menu-item"><a href="{{url_for('shop')}}">Shop</a></li>
+                                <li class="menu-item"><a href="{{url_for('about')}}">About</a></li>
+                                <li class="menu-item-has-children">
+                                    <a href="javascript:void(0);">Pages</a>
+                                    <ul class="submenu">
+                                        
+                                        <li class="menu-item"><a href="{{url_for('cart')}}">Cart</a></li>
+                                        <li class="menu-item"><a href="{{url_for('checkout')}}">Checkout</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="right-content d-xl-block d-none">
+                            <ul class="list list-unstyled d-flex">
+                                <li id="search-form">
+                                    <form method="get" action="{{ url_for('shop') }}">
+                                        <div class="input-group">
+                                            <button type="submit" class="input-group-text"><i class="fal fa-search"></i></button>
+                                            <input type="text" name="search" class="form-control" placeholder="Search">
+                                        </div>
+                                    </form>
+                                </li>
+                                <li><a href="javascript:;" class="search-btn"><i class="fal fa-search"></i></a></li>
+                                <li><a id="admin-link" href="{{url_for('admin')}}"><i class="fal fa-box-heart"></i></a>
+                                    <li>
+                                        <a href="{{url_for('cart')}}" class="cart-button">
+                                            <i class="fal fa-shopping-cart"></i>
+                                            {% if session.get('cart') %}
+                                                <span class="cart-count">{{ session['cart']|length }}</span>
+                                            {% endif %}
+                                        </a>
+                                    </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </header>
+            <!-- Header Area end -->
+
+            {% block index %}{% endblock index %}
+
+            {% block about %}{% endblock about %}
+            
+            {% block shop %}{% endblock shop %}
+            
+            {% block product_detail %}{% endblock product_detail %}
+            
+            {% block cart %}{% endblock cart %}
+            
+            {% block checkout %}{% endblock checkout %}
+
+
+ <!-- Shopping Cart Popup Start -->
+<aside id="sidebar-cart">
+    <a href="#" class="close-button"><span class="close-icon">X</span></a>
+    <div class="mb-32">
+        <h3 class="font-sec mb-32">SHOPPING CART <span class="h-27">({{ cart_item_count }})</span></h3>
+        <div class="vr-line"></div>
+    </div>
+    <ul class="product-list">
+        {% if cart %}
+            {% for product_id, item in cart.items() %}
+            <li class="product-item mb-24" data-product-id="{{ product_id }}">
+                <a href="javascript:;">
+                    <span class="item-image">
+                        <img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" alt="Product Photo">
+                    </span>
+                </a>
+                <div class="product-text">
+                    <a href="javascript:;">
+                        <h4 class="mb-16">{{ item['name'] }}</h4>
+                    </a>
+                    <div class="qp_row mb-8">
+                        <div class="quantity quantity-wrap">
+                            <form action="{{ url_for('add_to_cart', product_id=product_id) }}" method="POST">
+                                <input class="decrement" type="submit" value="-" >
+                                <input type="text" name="quantity" value="{{ item['quantity'] }}" maxlength="2" size="1" class="number" readonly>
+                                <input class="increment" type="submit" value="+" >
+                            </form>
+                        </div>
+                        <div class="price">
+                            <h5 class="mb-0"> ${{ item['price'] * item['quantity'] }}</h5>
+                        </div>
+                    </div>
+                    <form action="{{ url_for('remove_from_cart', product_id=product_id) }}" method="POST">
+                        <!-- Update the remove link in the shopping cart popup -->
+                        <button onclick="deleteCartItem('{{ product_id }}'); return false;" class="color-primary">REMOVE</button>
+                    </form>
+                </div>
+            </li>
+            <li class="vr-line mb-24"></li>
+            {% endfor %}
+        {% else %}
+            <li>No items in the cart.</li>
+        {% endif %}
+    </ul>
+    <div class="price-total">
+        <h4>SUBTOTAL</h4>
+        <h4>${{ total_price }}</h4>
+    </div>
+    <div class="vr-line mb-24"></div>
+    <div class="action-buttons">
+        <a href="{{ url_for('cart') }}" class="cus-btn bordered">VIEW CART</a>
+        <a href="{{ url_for('checkout') }}" class="cus-btn dark">CHECKOUT</a>
+    </div>
+ </aside>
+ <div id="sidebar-cart-curtain"></div>
+<!-- Shopping Cart Popup End -->
+
+ </div>
+            <!-- Jquery Js -->
+            <script src="{{url_for('static', filename='assets/js/vendor/jquery-3.6.3.min.js')}}"></script>
+            <script src="{{url_for('static', filename='assets/js/vendor/bootstrap.min.js')}}"></script>
+            <script src="{{url_for('static', filename='assets/js/vendor/slick.min.js')}}"></script>
+            <script src="{{url_for('static', filename='assets/js/vendor/jquery-appear.js')}}"></script>
+            <script src="{{url_for('static', filename='assets/js/vendor/jquery-validator.js')}}"></script>
+            <!-- Site Scripts -->
+            <script src="{{url_for('static', filename='assets/js/app.js')}}"></script>
+            <script src="{{url_for('static', filename='assets/js/cart.js')}}"></script>
+            <script>
+                // Check the role of the logged-in user
+                const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser")); // Save logged-in user info on login
+        
+                const adminLink = document.getElementById("admin-link");
+                if (!loggedInUser || loggedInUser.role !== "Admin") {
+                    // Change link to hash and optionally disable
+                    adminLink.href = "#";
+                    adminLink.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        alert("Access restricted to administrators only.");
+                    });
+                }
+            </script> 
+            
+</body>
+
+
+</html>

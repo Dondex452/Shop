@@ -1,0 +1,155 @@
+{% extends 'layout.html' %}
+
+{% block shop %}
+<style>
+    .sidebar {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.category-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    color: #333;
+}
+
+.category-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-item {
+    margin-bottom: 10px;
+}
+
+.category-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #555;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.category-link:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.category-link i {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        margin-bottom: 20px;
+    }
+
+    .category-link {
+        font-size: 14px;
+    }
+
+    .category-link i {
+        font-size: 16px;
+    }
+}
+
+
+</style>
+<!-- Page Banner start -->
+<section class="page-start-banner">
+    <div class="container">
+        <h2 class="title">Shop</h2>
+    </div>
+</section>
+<!-- Page Banner End -->
+
+<!-- Shop Area Start -->
+<section class="shop pt-96 pb-48">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+             <!-- Categories Sidebar -->
+                    <div class="sidebar">
+                        <h4 class="category-title">Categories</h4>
+                        <ul class="category-list">
+                            {% for category in categories %}
+                            <li class="category-item">
+                                <a href="?category={{ category }}" class="category-link">
+                                <i class="fal fa-tag"></i> <!-- Example icon for category -->
+                                <span>{{ category }}</span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+            </div>
+            <div class="col-lg-9">
+                <!-- Search Bar -->
+                <div class="search-bar mb-48">
+                    <form action="/shop" method="get">
+                        <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ search_query }}">
+                        <button type="submit" class="search-btn">Search</button>
+                    </form>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="row">
+                    {% for product in products %}
+                    <div class="col-xl-4 col-sm-6">
+                        <div class="product-card">
+                            <div class="showcase-box">
+                                <img alt="Product image" src="{{ url_for('static', filename=product.image.replace('\\', '/')) }}">
+
+
+
+                                <div class="overlay">
+                                    <div class="d-flex align-items-center justify-content-center icons">
+                                        <a href="/product_detail/{{ product.id }}"><i class="fal fa-eye"></i></a>
+                                        
+                                    </div>
+                                    <!-- Replace the existing add to cart button with this -->
+                                    <a href="#" onclick="addToCart('{{ product.id }}'); return false;" class="cus-btn light cart-button">Add to Cart</a>
+                                    
+                                </div>
+                            </div>
+                            <a href="/product_detail/{{ product.id }}" class="title">{{ product.name }}
+                                <span class="price">- ${{ product.price }}</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    {% if pagination.has_prev %}
+                    <a href="?page={{ pagination.prev_num }}" class="prev">&laquo; Previous</a>
+                    {% endif %}
+
+                    <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+
+                    {% if pagination.has_next %}
+                    <a href="?page={{ pagination.next_num }}" class="next">Next &raquo;</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Shop Area End -->
+
+
+
+
+
+{% endblock shop %}

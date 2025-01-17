@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Violet</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='assets/media/favicon-light.png') }}">
+
+    <!-- All CSS files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/vendor/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/vendor/font-awesome.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/vendor/slick.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/vendor/slick-theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+</head>
+
+<body>
+    <div id="main-wrapper" class="main-wrapper overflow-hidden">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='assets/media/logo.png') }}" alt="Violet Logo">
+                </a>
+            </div>
+        </header>
+
+        <!-- Login Form -->
+        <section class="login-section pt-96 pb-96">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-5">
+                        <div class="login-box">
+                            <h3 class="text-center mb-32">Login to Your Account</h3>
+                            <form method="POST" action="{{ url_for('login') }}">
+                                {{ form.hidden_tag() }}
+                                <div class="mb-16">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    {{ form.email(class_='form-control', placeholder='Enter your email') }}
+                                    {% for error in form.email.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                <div class="mb-16">
+                                    <label for="password" class="form-label">Password</label>
+                                    {{ form.password(class_='form-control', placeholder='Enter your password') }}
+                                    {% for error in form.password.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                <button type="submit" class="cus-btn dark w-100">Login</button>
+                                {% if error_message %}
+                                    <div class="text-danger mt-3">{{ error_message }}</div>
+                                {% endif %}
+                                <div class="text-center mt-32">
+                                    <p>Don't have an account? <a href="{{ url_for('register') }}" class="color-primary">Register Here</a></p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer text-center pt-32">
+            <p>©2024 All rights are reserved by Infinity</p>
+        </footer>
+    </div>
+
+    <!-- All JavaScript files -->
+    <script src="{{ url_for('static', filename='assets/js/vendor/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/vendor/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/vendor/slick.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/app.js') }}"></script>
+</body>
+
+</html>

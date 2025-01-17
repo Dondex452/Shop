@@ -1,0 +1,354 @@
+{% extends 'layout.html' %}
+{% block product_detail %}
+<style>
+    .review-box {
+    padding: 20px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.review-box .review {
+    max-height: 200px;  /* Adjust this value based on your design */
+    overflow-y: auto;   /* This will make the comment scrollable if it's too long */
+    word-wrap: break-word;  /* Ensures long words are wrapped properly */
+}
+
+.design-block {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px; /* Ensures the textarea has a minimum height */
+}
+
+.context-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 150px;
+}
+
+.context-menu li {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.context-menu li:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    padding: 10px 20px;
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #333;
+    cursor: pointer;
+}
+
+.pagination a:hover {
+    background-color: #ddd;
+}
+
+.pagination span {
+    font-size: 16px;
+    color: #333;
+}
+
+
+</style>
+            <!-- Page Banner start -->
+            <section class="page-start-banner">
+                <div class="container">
+                    <h2 class="title">Product Detail</h2>
+                </div>
+            </section>
+            <!-- Page Banner End -->
+
+            <!-- Products Area start -->
+            <section class="product-detail pt-96 pb-48">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="detail-img-block">
+                                <img alt="Product image" src="{{ url_for('static', filename=product.image.replace('\\', '/')) }}">
+
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="detail">
+                                <div class="d-flex mb-16">
+                                    <h5 class="p-name">{{ product.name }}</h5>
+                                    <h6 class="price">${{ product.price }}</h6>
+                                </div>
+                                <p class="mb-32">
+                                    {{ product.short_note }}
+                                </p>
+                                <div class="features mb-32">
+                                    <h6 class="title">Category: <span>{{ product.category }}</span></h6>
+                                </div>
+                                <div class="lower-content">
+                                    <div class="quantity quantity-wrap">
+                                        <input class="decrement" type="button" value="-" >
+                                        <input type="text" name="quantity" value="1" maxlength="2" size="1" class="number">
+                                        <input class="increment" type="button" value="+" >
+                                    </div>
+                                </div>
+                                <div class="d-sm-flex">
+                                    <a href="#" onclick="addToCart('{{ product.id }}'); return false;" class="cus-btn light cart-button">Add to Cart</a>
+                                    <a href="#" class="cus-btn bordered">Purchase Now</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>             
+            <!-- Products Area end -->
+
+            <!-- About Product Area start -->
+            <section class="about-products pt-48 pb-48">
+                <div class="container">
+                    <div class="about-product pt-5">              
+                        <ul class="nav nav-tabs title-btn" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">Product Detail</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="reviews" class="tab-pane in active pt-4">
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <div id="reviews" class="tab-pane in active pt-4">
+                                            {% for review in reviews %}
+                                            <div class="review-box" data-review-id="{{ review.id }}">
+                                                <div class="d-flex justify-content-between">
+                                                    <div class="d-flex">
+                                                        <img src="{{ url_for('static', filename='assets/media/user/u-1.png') }}" alt="">
+                                                        <div class="user">
+                                                            <h6 class="name">{{ review.user_name }}</h6>  <!-- This line changed -->
+                                                        </div>
+                                                    </div>
+                                                    {% if 'username' in session and session['username'] == review.user_name %}
+                                                    <div class="review-actions">
+                                                        <button class="btn btn-link text-danger delete-review" 
+                                                                data-review-id="{{ review.id }}"
+                                                                title="Delete review">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                <p class="review mt-2">
+                                                    {{ review.comment }}
+                                                </p>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        <!-- Pagination controls -->
+                                        <div>
+                                            {% if pagination.has_prev %}
+                                              <a href="{{ url_for('product_detail', product_id=product.id, page=pagination.prev_num) }}">Previous</a>
+                                            {% endif %}
+                                          
+                                            {% if pagination.has_next %}
+                                              <a href="{{ url_for('product_detail', product_id=product.id, page=pagination.next_num) }}">Next</a>
+                                            {% endif %}
+                                          </div>
+                                          
+                                
+                                    </div>
+                                    
+                                    <div class="col-lg-4">
+                                        <div class="design-block">
+                                            <h6>Add a Review</h6>
+                                            <form method="POST" action="{{ url_for('add_review', product_id=product.id) }}">
+                                                <div class="input-group mb-32">
+                                                    <textarea name="review" class="form-control" id="review" rows="3" required placeholder="Your Review"></textarea>
+                                                </div>
+                                                <button type="submit" class="cus-btn dark">Add Review</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- About Product Area end -->
+
+           
+
+            <!-- footer Area start -->
+            <footer class="footer">
+                <div class="container">
+                    
+                    <div class="bottom-content">
+                        <div class="row">
+                            <div class="col-xl-9">
+                                <h5 class="title">Contact Info</h5>
+                                <div class="contact-row">
+                                    <ul class="contact-list list-unstyled">
+                                        <li><a href="tel:123456789"><i class="fal fa-phone-alt"></i>+1 233 898 0897</a></li>
+                                        <li><a href="mailto:info@gmail.com"><i class="fal fa-envelope"></i>email@example.com</a></li>
+                                        <li><span> <i class="fal fa-map-marker-alt"></i>123 Main Street, Anytown, USA.</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-xl-3">
+                                <h5 class="title">Social Links</h5>
+                                <div class="contact-row">
+                                    <ul class="footer-social-icon list-unstyled">
+                                        <li><a href="#"><img src="{{url_for('static', filename='assets/media/icon/icon.png')}}" alt=""></a></li>
+                                        <li><a href="#"><img src="{{url_for('static', filename='assets/media/icon/Vector.png')}}" alt=""></a></li>
+                                        <li><a href="#"><img src="{{url_for('static', filename='assets/media/icon/Vector-1.png')}}" alt=""></a></li>
+                                        <li><a href="#"><img src="{{url_for('static', filename='assets/media/icon/Vector-2.png')}}" alt=""></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="copyright">©2024 All rights are reserved by Infinity</p> 
+                    </div>
+                </div>
+            </footer>
+            <!-- footer Area end -->
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+    let deletePopupVisible = false; // Track whether the popup is visible
+    let longPressTimer; // Timer for detecting long press
+
+    // Right-click event for desktop
+    document.addEventListener('contextmenu', function (e) {
+        const reviewElement = e.target.closest('.review-box');
+        if (reviewElement) {
+            e.preventDefault(); // Prevent the default right-click menu
+
+            // If a popup already exists, do nothing
+            if (deletePopupVisible) return;
+
+            const confirmation = confirm("Are you sure you want to delete this review?");
+            if (confirmation) {
+                const reviewId = reviewElement.dataset.reviewId; // Ensure data-review-id exists on .review-box
+
+                // Perform delete action
+                fetch(`/delete_review/${reviewId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json(); // Parse JSON response
+                    } else {
+                        throw new Error(`Failed to delete review. Status: ${response.status}`);
+                    }
+                })
+                .then(data => {
+                    console.log(data.message); // Optional: Log success message
+                    reviewElement.remove(); // Remove review from DOM
+                })
+                .catch(error => {
+                    console.error("Error deleting review:", error);
+                    alert("Failed to delete review.");
+                });
+
+                deletePopupVisible = true;
+
+                // Reset the popup visibility after a short delay
+                setTimeout(() => {
+                    deletePopupVisible = false;
+                }, 500);
+            }
+        }
+    });
+
+    // Long press event for mobile (touchstart)
+    document.addEventListener('touchstart', function (e) {
+        const reviewElement = e.target.closest('.review-box');
+        if (reviewElement) {
+            // Start long press timer
+            longPressTimer = setTimeout(() => {
+                longPressTimer = null; // Reset timer
+                
+                // Show confirmation popup
+                if (deletePopupVisible) return;
+
+                const confirmation = confirm("Are you sure you want to delete this review?");
+                if (confirmation) {
+                    const reviewId = reviewElement.dataset.reviewId; // Ensure data-review-id exists on .review-box
+
+                    // Perform delete action
+                    fetch(`/delete_review/${reviewId}`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json(); // Parse JSON response
+                        } else {
+                            throw new Error(`Failed to delete review. Status: ${response.status}`);
+                        }
+                    })
+                    .then(data => {
+                        console.log(data.message); // Optional: Log success message
+                        reviewElement.remove(); // Remove review from DOM
+                    })
+                    .catch(error => {
+                        console.error("Error deleting review:", error);
+                        alert("Failed to delete review.");
+                    });
+
+                    deletePopupVisible = true;
+
+                    // Reset the popup visibility after a short delay
+                    setTimeout(() => {
+                        deletePopupVisible = false;
+                    }, 500);
+                }
+            }, 800); // Long press duration (800ms)
+        }
+    });
+
+    // Cancel long press if the touch ends or moves
+    document.addEventListener('touchend', function () {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer); // Clear the long press timer
+        }
+    });
+
+    // Cancel long press if the touch moves
+    document.addEventListener('touchmove', function () {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer); // Clear the long press timer
+        }
+    });
+});
+            
+        </script>
+            {% endblock product_detail %}

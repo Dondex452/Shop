@@ -1,0 +1,306 @@
+{% extends 'layout.html' %}
+{% block checkout %}
+
+<!-- Page Banner start -->
+<section class="page-start-banner">
+    <div class="container">
+        <h2 class="title">Checkout</h2>
+    </div>
+</section>
+<!-- Page Banner End -->
+
+<!-- Checkout Area start -->
+<section class="checkout pt-96 pb-48">
+    <div class="container">
+        <div class="row">
+            <!-- Shipping Details -->
+            <div class="col-xl-6 mb-48 mb-xl-0">
+                <div class="heading">
+                    <h4>Shipping Details</h4>
+                </div>
+                <div class="design-block shipping">
+                    <form method="POST" action="{{ url_for('checkout') }}" id="checkout-form">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="first_name" required placeholder="First Name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="last_name" required placeholder="Last Name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="email" class="form-control" name="email" required placeholder="Email">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="phone" required placeholder="Phone Number">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="country" required placeholder="Country">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="state" required placeholder="State / County">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="house_address" required placeholder="House no and street name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="apartment_address" placeholder="Apartment, suite, (optional)">
+                                </div>
+                            </div>
+                            <div class="formGroup2">
+                                <input type="checkbox" id="billingSameShipping" name="billing_same_as_shipping">
+                                <label for="billingSameShipping"> Billing Address Same As Shipping Address</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Billing Details -->
+            <div class="col-xl-6">
+                <div class="heading">
+                    <h4>Billing Details</h4>
+                </div>
+                <div class="design-block billing">
+                    <form method="POST" action="{{ url_for('checkout') }}" id="checkout-form">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="billing_first_name" required placeholder="First Name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="billing_last_name" required placeholder="Last Name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="email" class="form-control" name="billing_email" required placeholder="Email">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="billing_phone" required placeholder="Phone Number">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="billing_country" required placeholder="Country">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="billing_state" required placeholder="State / County">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="billing_house_address" required placeholder="House no and street name">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group mb-24">
+                                    <input type="text" class="form-control" name="billing_apartment_address" placeholder="Apartment, suite, (optional)">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Checkout Area end -->
+
+<!-- Order Summary Area -->
+<section class="cart pt-48 pb-48">
+    <div class="container">
+        <form id="checkout-form" method="POST" action="{{ url_for('checkout') }}">
+            <div class="row">
+                <div class="col-xl-8">
+                    <div class="heading">
+                        <h4>Order Summary</h4>
+                    </div>
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Image</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>
+                                    <img src="{{ url_for('static', filename=item.image.replace('\\', '/')) }}" 
+                                         alt="{{ item.name }}" 
+                                         class="product-thumbnail"
+                                         style="max-width: 50px; height: auto;">
+                                </td>
+                                <td>${{ "%.2f"|format(item.price) }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ "%.2f"|format(item.total) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-xl-4">
+                    <div class="cart-detail">
+                        <div class="content-block">
+                            <h3>Order Total</h3>
+                            <div class="detail-row">
+                                <p>Items Total</p>
+                                <span>${{ "%.2f"|format(subtotal) }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <p>Shipping Fee</p>
+                                <span>${{ "%.2f"|format(shipping_fee) }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <p>Tax</p>
+                                <span>${{ "%.2f"|format(tax) }}</span>
+                            </div>
+                            <div class="total-row">
+                                <h6>Grand Total</h6>
+                                <span>${{ "%.2f"|format(grand_total) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="content-block">
+                            <div class="payment-method">
+                                <h6>Payment Method</h6>
+                                <div class="payment-options">
+                                    <label for="cod" class="payment-option">
+                                        <input id="cod" type="radio" name="payment_method" value="COD" required>
+                                        <span class="payment-icon"><i class="fas fa-money-bill-wave"></i></span>
+                                        <span class="payment-label">Cash on Delivery</span>
+                                    </label>
+                                    
+                                    <label for="card" class="payment-option">
+                                        <input id="card" type="radio" name="payment_method" value="Card">
+                                        <span class="payment-icon"><i class="fas fa-credit-card"></i></span>
+                                        <span class="payment-label">Credit/Debit Card</span>
+                                    </label>
+                                </div>
+                                
+                                <div id="card-payment-form" style="display: none;">
+                                    <div id="card-element" class="form-control mt-3"></div>
+                                    <div id="card-errors" class="text-danger mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="cus-btn dark w-100" id="submit-payment">
+                            Complete Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const elements = stripe.elements();
+    const card = elements.create('card');
+    const form = document.getElementById('checkout-form');
+    
+    document.querySelectorAll('input[name="payment_method"]').forEach(input => {
+        input.addEventListener('change', function() {
+            const cardForm = document.getElementById('card-payment-form');
+            if (this.value === 'Card') {
+                cardForm.style.display = 'block';
+                card.mount('#card-element');
+            } else {
+                cardForm.style.display = 'none';
+                card.unmount();
+            }
+        });
+    });
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        
+        if (paymentMethod === 'Card') {
+            const {error} = await stripe.createPaymentMethod('card', card);
+            if (error) {
+                const errorElement = document.getElementById('card-errors');
+                errorElement.textContent = error.message;
+                return;
+            }
+        }
+        
+        this.submit();
+    });
+</script>
+
+<script>
+    document.getElementById('checkout-form').addEventListener('submit', function(e) {
+        const requiredFields = [
+            'first_name', 'last_name', 'email', 'phone',
+            'country', 'state', 'house_address',
+            'billing_first_name', 'billing_last_name', 'billing_email', 'billing_phone',
+            'billing_country', 'billing_state', 'billing_house_address'
+        ];
+    
+        let isValid = true;
+        requiredFields.forEach(field => {
+            const input = document.querySelector(`[name="${field}"]`);
+            if (!input.value.trim()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+    
+        if (!document.querySelector('input[name="payment_method"]:checked')) {
+            alert('Please select a payment method');
+            isValid = false;
+        }
+    
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fill in all required fields');
+        }
+    });
+    
+    // Copy shipping address to billing if checkbox is checked
+    document.getElementById('billingSameShipping').addEventListener('change', function() {
+        if (this.checked) {
+            document.querySelector('[name="billing_first_name"]').value = document.querySelector('[name="first_name"]').value;
+            document.querySelector('[name="billing_last_name"]').value = document.querySelector('[name="last_name"]').value;
+            document.querySelector('[name="billing_email"]').value = document.querySelector('[name="email"]').value;
+            document.querySelector('[name="billing_phone"]').value = document.querySelector('[name="phone"]').value;
+            document.querySelector('[name="billing_country"]').value = document.querySelector('[name="country"]').value;
+            document.querySelector('[name="billing_state"]').value = document.querySelector('[name="state"]').value;
+            document.querySelector('[name="billing_house_address"]').value = document.querySelector('[name="house_address"]').value;
+            document.querySelector('[name="billing_apartment_address"]').value = document.querySelector('[name="apartment_address"]').value;
+        }
+    });
+    </script>
+{% endblock checkout %}

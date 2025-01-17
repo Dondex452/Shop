@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+{% block index %}
+
+            <!-- banner Area start -->
+            <section class="banner">
+                <div class="content">
+                    <div class="container">
+                        <h2 class="title">LUXURIOUS BEAUTY</h2>
+                        <h5>Find Your Perfect Cosmetics Here</h5>
+                        <p class="description">Indulge into the world of luxurious beauty and<br> discover a curated collection of exquisite<br> cosmetics. At Violet, we believe that beauty is<br> an art, and we offer a wide range of high-<br>quality products to enhance your natural glow.</p>
+                        <a href="{{url_for('shop')}}" class="cus-btn dark">Explore Products</a>
+                    </div>
+                </div>
+            </section>
+            <!-- banner Area end -->
+
+              <!-- Inner Banner Area start -->
+              <section class="inner-banner">
+                <div class="container">
+                    <div class="content">
+                        <h2>10 <span>%OFF</span></h2>  
+                        <h5>ON SUNBLOCK</h5>
+                    </div>
+                </div>
+            </section>
+            <!-- Inner Banner Area end -->
+
+            <!-- footer Area start -->
+            <footer class="footer">
+                <div class="container">
+                
+                    <div class="bottom-content">
+                        <div class="row">
+                            <div class="col-xl-9">
+                                <h5 class="title">Contact Info</h5>
+                                <div class="contact-row">
+                                    <ul class="contact-list list-unstyled">
+                                        <li><a href="tel:123456789"><i class="fal fa-phone-alt"></i>+1 233 898 0897</a></li>
+                                        <li><a href="mailto:info@gmail.com"><i class="fal fa-envelope"></i>email@example.com</a></li>
+                                        <li><span> <i class="fal fa-map-marker-alt"></i>123 Main Street, Anytown, USA.</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-xl-3">
+                                <h5 class="title">Social Links</h5>
+                                <div class="contact-row">
+                                    <ul class="footer-social-icon list-unstyled">
+                                        <li><a href="#"><img src="{{url_for('static', filename='assets/media/icon/icon.png')}}" alt=""></a></li>
+                                        <li><a href="#"><img src="{{url_for('static', filename='assets/media/icon/Vector.png')}}" alt=""></a></li>
+                                        <li><a href="#"><img src="{{url_for('static', filename='assets/media/icon/Vector-1.png')}}" alt=""></a></li>
+                                        <li><a href="#"><img src="{{url_for('static', filename='assets/media/icon/Vector-2.png')}}" alt=""></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="copyright">©2024 All rights are reserved by Infinity</p> 
+                    </div>
+                </div>
+            </footer>
+            <!-- footer Area end -->
+            
+
+{% endblock index %}    

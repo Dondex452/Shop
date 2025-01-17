@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Violet</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{{url_for('static', filename='assets/media/favicon-light.png')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='assets/css/vendor/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='assets/css/vendor/font-awesome.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='assets/css/vendor/slick.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='assets/css/vendor/slick-theme.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='assets/css/app.css')}}">
+</head>
+
+<body>
+    <div id="main-wrapper" class="main-wrapper overflow-hidden">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <a class="navbar-brand" href="{{url_for('index')}}">
+                    <img src="{{url_for('static', filename='assets/media/logo.png')}}" alt="Violet Logo">
+                </a>
+            </div>
+        </header>
+
+        <!-- Admin Dashboard -->
+        <section class="admin-dashboard pt-96 pb-96">
+            <div class="container">
+                <h2 class="text-center mb-32">Admin Dashboard</h2>
+
+                <!-- Add Product Form -->
+                <div class="mb-48">
+                    <h4>Add New Product</h4>
+                    <form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-16">
+                            <label for="name" class="form-label">Product Name</label>
+                            <input type="text" id="name" name="name" class="form-control" required>
+                        </div>
+                        <div class="mb-16">
+                            <label for="short_note" class="form-label">Short Note</label>
+                            <textarea id="short_note" name="short_note" class="form-control" required></textarea>
+                        </div>
+                        <div class="mb-16">
+                            <label for="category" class="form-label">Category</label>
+                            <select id="category" name="category" class="form-control" required>
+                                {% for category in categories %}
+                                <option value="{{ category }}">{{ category }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-16">
+                            <label for="price" class="form-label">Price</label>
+                            <input type="number" step="0.01" id="price" name="price" class="form-control" required>
+                        </div>
+                        <div class="mb-16">
+                            <label for="image" class="form-label">Product Image</label>
+                            <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
+                        </div>
+                        <button type="submit" class="cus-btn dark">Add Product</button>
+                    </form>
+                    
+                </div>
+
+
+                <!-- Manage Categories -->
+<div class="mb-48">
+    <h4>Manage Categories</h4>
+    <form action="{{ url_for('add_category') }}" method="POST">
+        <div class="mb-16">
+            <label for="new_category" class="form-label">New Category</label>
+            <input type="text" id="new_category" name="new_category" class="form-control" required>
+        </div>
+        <button type="submit" class="cus-btn dark">Add Category</button>
+    </form>
+
+    <h5 class="mt-32">Existing Categories</h5>
+    <ul class="list-group">
+        {% for category in categories %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ category }}
+            <form action="{{ url_for('delete_category', category=category) }}" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+
+                <!-- Users List -->
+                <div class="mb-48">
+                    <h4>Registered Users</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Registration Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.registration_date }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Checkout Transactions -->
+                <div class="mb-48">
+                    <h4>Checkout Transactions</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>User ID</th>
+                                <th>Total Amount</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr>
+                                <td>{{ transaction.id }}</td>
+                                <td>{{ transaction.user_id }}</td>
+                                <td>{{ transaction.total_amount }}</td>
+                                <td>{{ transaction.date }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Product List -->
+                <div>
+                    <h4>Product List</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>{{ product.id }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.category }}</td>
+                                <td>{{ product.price }}</td>
+                                <td>
+                                    <form action="{{ url_for('delete_product', product_id=product.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer text-center pt-32">
+            <p>©2024 All rights are reserved by Infinity</p>
+        </footer>
+    </div>
+</body>
+
+</html>
