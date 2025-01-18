@@ -29,15 +29,14 @@
  
     </head>
     <style>
-  
-    .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 25px;
-        border-radius: 4px;
-        z-index: 9999;
-        animation: slideIn 0.5s ease-out;
+      .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 4px;
+    z-index: 9999;
+    animation: slideIn 0.5s ease-out;
 }
 
 .notification.success {
@@ -123,12 +122,11 @@
                                         </a>
                                     </li>
 
-                                    {% if session.get('user_id') %}
+                                    <!-- Add the logout button -->
+                                  
                                     <li><a href="{{url_for('logout')}}" title="Logout"><i class="fal fa-sign-out"></i></a></li>
-                                    {% else %}
-                                        <li><a href="{{url_for('login')}}" title="Login"><i class="fal fa-sign-in"></i></a></li>
-                                    {% endif %}
-                            
+                                    
+                                    
                             </ul>
                         </div>
                     </nav>

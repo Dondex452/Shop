@@ -597,10 +597,21 @@ app.config['STRIPE_SECRET_KEY'] = 'sk_test_51QgMvoPRBjc9OqRgzKXxjIV3rbQpqBqDRY6s
 stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
 
+# First, create a custom login_required decorator
 
 
+def session_login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('Please login to continue.', 'error')
+            return redirect(url_for('login', next=request.path))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# Modified checkout route using session-based authentication
 @app.route('/checkout', methods=['GET', 'POST'])
-@login_required
+@session_login_required
 def checkout():
     if request.method == 'POST':
         cart = session.get('cart', {})
@@ -617,7 +628,7 @@ def checkout():
         try:
             # Create order with shipping details
             order = Order(
-                user_id=current_user.id,
+                user_id=session['user_id'],  # Changed from current_user.id
                 total_amount=grand_total,
                 payment_method=request.form.get('payment_method'),
                 shipping_address=request.form.get('house_address', ''),
@@ -667,7 +678,6 @@ def checkout():
 
             # Handle payment method
             if request.form.get('payment_method') == 'Card':
-                # Existing Stripe payment handling
                 checkout_session = stripe.checkout.Session.create(
                     payment_method_types=['card'],
                     line_items=[{
@@ -702,7 +712,7 @@ def checkout():
             flash('Error processing order', 'error')
             return redirect(url_for('checkout'))
 
-    # Rest of the GET request handling remains the same
+    # GET request handling
     cart = session.get('cart', {})
     cart_items = []
     
@@ -733,9 +743,8 @@ def checkout():
         stripe_public_key=app.config['STRIPE_PUBLIC_KEY']
     )
 
-
 @app.route('/payment/success/<int:order_id>')
-@login_required
+@session_login_required
 def payment_success(order_id):
     try:
         order = Order.query.get_or_404(order_id)
@@ -770,7 +779,7 @@ def payment_success(order_id):
 
 
 @app.route('/payment/cancel/<int:order_id>')
-@login_required
+@session_login_required
 def payment_cancel(order_id):
     try:
         order = Order.query.get_or_404(order_id)
@@ -792,7 +801,7 @@ def payment_cancel(order_id):
 
 
 @app.route('/order/confirmation/<int:order_id>')
-@login_required
+@session_login_required
 def order_confirmation(order_id):
     try:
         order = Order.query.get_or_404(order_id)

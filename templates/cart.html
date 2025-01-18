@@ -50,19 +50,50 @@
                 {% endif %}
             
              <!-- Add this after the cart table -->
-                {% if total_pages > 1 %}
-                <div class="pagination mt-4">
-                    {% if has_prev %}
-                    <a href="{{ url_for('cart', page=current_page-1) }}" class="btn btn-outline-primary">&laquo; Previous</a>
-                    {% endif %}
-                    
-                    <span class="mx-3">Page {{ current_page }} of {{ total_pages }}</span>
-                    
-                    {% if has_next %}
-                    <a href="{{ url_for('cart', page=current_page+1) }}" class="btn btn-outline-primary">Next &raquo;</a>
-                    {% endif %}
-                </div>
-                {% endif %}
+             {% if total_pages > 1 %}
+             <div class="text-center">
+                 <div class="pagination-wrape">
+                     <ul class="pagination">
+                         {% if has_prev %}
+                         <li class="page-item">
+                             <a href="{{ url_for('cart', page=current_page-1) }}" class="page-link arrow" aria-label="previous">
+                                 <i class="far fa-chevron-left"></i>
+                             </a>
+                         </li>
+                         {% else %}
+                         <li class="page-item disabled">
+                             <a href="#" class="page-link arrow" aria-label="previous">
+                                 <i class="far fa-chevron-left"></i>
+                             </a>
+                         </li>
+                         {% endif %}
+             
+                         {% for page in range(1, total_pages + 1) %}
+                             {% if page == current_page %}
+                             <li class="page-item"><a class="page-link current" href="#">{{ page }}</a></li>
+                             {% else %}
+                             <li class="page-item"><a class="page-link" href="{{ url_for('cart', page=page) }}">{{ page }}</a></li>
+                             {% endif %}
+                         {% endfor %}
+             
+                         {% if has_next %}
+                         <li class="page-item">
+                             <a href="{{ url_for('cart', page=current_page+1) }}" class="page-link arrow" aria-label="next">
+                                 <i class="far fa-chevron-right"></i>
+                             </a>
+                         </li>
+                         {% else %}
+                         <li class="page-item disabled">
+                             <a href="#" class="page-link arrow" aria-label="next">
+                                 <i class="far fa-chevron-right"></i>
+                             </a>
+                         </li>
+                         {% endif %}
+                     </ul>
+                 </div>
+             </div>
+             {% endif %}
+             
 
             </div>
             <div class="col-xl-4">
