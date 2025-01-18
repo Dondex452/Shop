@@ -502,7 +502,8 @@ def cart_context():
     return {
         'cart': cart,
         'cart_count': cart_count,
-        'cart_total': cart_total
+        'cart_total': cart_total,
+        'cart_item_count': len(cart)  # Add this for item count
     }
 
 from flask import g
@@ -607,53 +608,54 @@ def checkout():
             flash('Your cart is empty', 'error')
             return redirect(url_for('cart'))
 
+        # Calculate totals
         subtotal = sum(item['price'] * item['quantity'] for item in cart.values())
         tax = round(subtotal * 0.1, 2)
         shipping_fee = 10.00
         grand_total = subtotal + tax + shipping_fee
 
         try:
-            # Create order with full shipping and billing information
+            # Create order with shipping details
             order = Order(
                 user_id=current_user.id,
                 total_amount=grand_total,
                 payment_method=request.form.get('payment_method'),
-                shipping_address=f"{request.form.get('house_address')} {request.form.get('apartment_address', '')}".strip(),
-                shipping_city=request.form.get('state'),
-                shipping_country=request.form.get('country'),
-                shipping_postal_code=request.form.get('postal_code'),
-                billing_address=f"{request.form.get('billing_house_address')} {request.form.get('billing_apartment_address', '')}".strip(),
-                billing_city=request.form.get('billing_state'),
-                billing_country=request.form.get('billing_country'),
-                billing_postal_code=request.form.get('billing_postal_code')
+                shipping_address=request.form.get('house_address', ''),
+                shipping_city=request.form.get('state', ''),
+                shipping_country=request.form.get('country', ''),
+                shipping_postal_code=request.form.get('postal_code', ''),
+                billing_address=request.form.get('billing_house_address', ''),
+                billing_city=request.form.get('billing_state', ''),
+                billing_country=request.form.get('billing_country', ''),
+                billing_postal_code=request.form.get('billing_postal_code', '')
             )
             db.session.add(order)
-            db.session.flush()  # Get the order ID without committing
+            db.session.flush()
 
-            # Create complete billing details
-            billing_details = BillingDetails(
-                order_id=order.id,
-                full_name=f"{request.form.get('billing_first_name')} {request.form.get('billing_last_name')}",
-                email=request.form.get('billing_email'),
-                address=f"{request.form.get('billing_house_address')} {request.form.get('billing_apartment_address', '')}".strip(),
-                city=request.form.get('billing_state'),
-                postal_code=request.form.get('billing_postal_code'),
-                country=request.form.get('billing_country')
-            )
-            db.session.add(billing_details)
-
-            # Create complete shipping details
+            # Create shipping details
             shipping_details = ShippingDetails(
                 order_id=order.id,
-                full_name=f"{request.form.get('first_name')} {request.form.get('last_name')}",
-                address=f"{request.form.get('house_address')} {request.form.get('apartment_address', '')}".strip(),
-                city=request.form.get('state'),
-                postal_code=request.form.get('postal_code'),
-                country=request.form.get('country')
+                full_name=f"{request.form.get('first_name', '')} {request.form.get('last_name', '')}".strip(),
+                address=request.form.get('house_address', ''),
+                city=request.form.get('state', ''),
+                postal_code=request.form.get('postal_code', ''),
+                country=request.form.get('country', '')
             )
             db.session.add(shipping_details)
 
-            # Save all order items with complete information
+            # Create billing details
+            billing_details = BillingDetails(
+                order_id=order.id,
+                full_name=f"{request.form.get('billing_first_name', '')} {request.form.get('billing_last_name', '')}".strip(),
+                email=request.form.get('billing_email', ''),
+                address=request.form.get('billing_house_address', ''),
+                city=request.form.get('billing_state', ''),
+                postal_code=request.form.get('billing_postal_code', ''),
+                country=request.form.get('billing_country', '')
+            )
+            db.session.add(billing_details)
+
+            # Add order items
             for product_id, item in cart.items():
                 order_item = OrderItem(
                     order_id=order.id,
@@ -663,46 +665,40 @@ def checkout():
                 )
                 db.session.add(order_item)
 
+            # Handle payment method
             if request.form.get('payment_method') == 'Card':
-                order.payment_status = 'awaiting_payment'
-                order.order_status = 'pending'
-                try:
-                    checkout_session = stripe.checkout.Session.create(
-                        payment_method_types=['card'],
-                        line_items=[{
-                            'price_data': {
-                                'currency': 'usd',
-                                'unit_amount': int(grand_total * 100),
-                                'product_data': {
-                                    'name': f'Order #{order.id}',
-                                },
+                # Existing Stripe payment handling
+                checkout_session = stripe.checkout.Session.create(
+                    payment_method_types=['card'],
+                    line_items=[{
+                        'price_data': {
+                            'currency': 'usd',
+                            'unit_amount': int(grand_total * 100),
+                            'product_data': {
+                                'name': f'Order #{order.id}',
                             },
-                            'quantity': 1,
-                        }],
-                        mode='payment',
-                        success_url=url_for('payment_success', order_id=order.id, _external=True),
-                        cancel_url=url_for('payment_cancel', order_id=order.id, _external=True),
-                    )
-                    order.stripe_payment_id = checkout_session.id
-                    db.session.commit()
-                    return redirect(checkout_session.url)
-                except Exception as e:
-                    db.session.rollback()
-                    print(f"Stripe error: {str(e)}")
-                    flash('Error processing card payment', 'error')
-                    return redirect(url_for('checkout'))
-            
-            elif request.form.get('payment_method') == 'COD':
+                        },
+                        'quantity': 1,
+                    }],
+                    mode='payment',
+                    success_url=url_for('payment_success', order_id=order.id, _external=True),
+                    cancel_url=url_for('payment_cancel', order_id=order.id, _external=True),
+                )
+                order.stripe_payment_id = checkout_session.id
+                db.session.commit()
+                return redirect(checkout_session.url)
+            else:
+                # COD payment handling
                 order.payment_status = 'pending'
                 order.order_status = 'processing'
                 db.session.commit()
-                session.pop('cart', None)  # Clear the cart after successful order
+                session.pop('cart', None)
                 flash('Order placed successfully! You will pay on delivery.', 'success')
                 return redirect(url_for('order_confirmation', order_id=order.id))
 
         except Exception as e:
             db.session.rollback()
-            print(f"Error: {str(e)}")
+            print(f"Error processing order: {str(e)}")
             flash('Error processing order', 'error')
             return redirect(url_for('checkout'))
 
@@ -793,6 +789,7 @@ def payment_cancel(order_id):
     except Exception as e:
         flash('Error cancelling order', 'error')
         return redirect(url_for('checkout'))
+
 
 @app.route('/order/confirmation/<int:order_id>')
 @login_required
